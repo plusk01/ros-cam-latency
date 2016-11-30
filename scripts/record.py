@@ -3,12 +3,18 @@ import sys
 import time
 
 import rospy
-
 import numpy as np
 import cv2
 
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge
+
 def main():
     rospy.init_node('record', anonymous=False)
+
+    # OpenCV to ROS stuff
+    img_pub = rospy.Publisher('img', Image, queue_size=10)
+    bridge = CvBridge()
 
     # Select the camera to measure latency of
     cap = cv2.VideoCapture(0)
@@ -25,7 +31,6 @@ def main():
     times = []
 
     while(True):
-        # time now
         now = rospy.Time.now().to_sec()
 
         # Print out the current time for the camera to record
@@ -38,8 +43,13 @@ def main():
         ret, frame = cap.read()
 
         # Capture frame count to calculate stats with
-        i += 1
         times.append(rospy.Time.now().to_sec() - now)
+        i += 1
+
+        # Publish
+        img = bridge.cv2_to_imgmsg(frame, 'bgr8')
+        img.header.stamp = rospy.Time.now()
+        img_pub.publish(img)
 
         # Display the resulting frame, if not paused
         if not pause:
@@ -53,6 +63,7 @@ def main():
             pause = not pause
 
     print("\n\nAverage camera fps: {}".format((1.0*i)/np.sum(times)))
+    print("Num frames received: {}".format(i))
 
     # When everything done, release the capture
     cap.release()
