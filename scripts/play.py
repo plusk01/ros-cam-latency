@@ -10,6 +10,7 @@ import matplotlib.animation as animation
 from sensor_msgs.msg import Image
 
 # Globals
+SHOW_PLOT = False
 line = None
 diff_ms = []
 
@@ -57,15 +58,18 @@ def main():
     plt.title('Transmission latency [ms]')
     ax.set_ylim(0,10)
 
-    global line
-    line = ax.plot([],[], linewidth=0.6, animated=False)[0]
-    animate = animation.FuncAnimation(fig, _animate, init_func=_init, frames=None,
-                            interval=10, blit=True)
-
     # OpenCV to ROS stuff
     img_sub = rospy.Subscriber('img', Image, _handle_img)
 
-    plt.show()
+    if SHOW_PLOT:
+        global line
+        line = ax.plot([],[], linewidth=0.6, animated=False)[0]
+        animate = animation.FuncAnimation(fig, _animate, init_func=_init, frames=None,
+                                interval=10, blit=True)
+
+        # plt.show acts as rospy.spin()
+        plt.show()
+
     rospy.spin()
 
 if __name__ == '__main__':
