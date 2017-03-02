@@ -22,3 +22,8 @@ This node does the work of showing the video feed and starting the terminal cloc
 #### play.py ####
 
 This node subscribes to the `/img` topic and finds the transmission latency in milliseconds. This is the current ROS time minus the time of image capture (embedded in the header of the `img` message). You can have this node plot the latency over time by setting `SHOW_PLOT = True`. The transmission delay of the example camera with the two nodes on the same machine was ~1.5ms.
+
+----------------------------
+
+### Related Links ###
+- https://www.makehardware.com/2016/03/29/finding-a-low-latency-webcam/
